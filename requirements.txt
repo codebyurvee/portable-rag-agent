@@ -1,0 +1,36 @@
+# ── Portable RAG Agent — Python dependencies ──
+
+# Core agent frameworks
+langgraph
+langchain
+llama-index
+
+# LLM / embedding providers
+openai
+anthropic
+
+# Vector stores
+chromadb
+
+# API layer
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Document loading / parsing
+pypdf
+python-docx
+unstructured
+
+# UI
+streamlit
+
+# Utilities
+python-dotenv
+tenacity
+httpx
+
+# Testing
+pytest
+pytest-asyncio
