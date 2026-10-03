@@ -1,0 +1,16 @@
+spec_version: "0.1.0"
+name: portable-rag-agent
+version: "1.0.0"
+description: A portable research agent that answers questions using controlled documents, web search, and calculator tools.
+author: portable-rag-agent
+model:
+  preferred: Qwen/Qwen3-8B
+tools:
+  - rag-search
+  - calculator
+  - web-search
+tags:
+  - rag
+  - portability
+  - langgraph
+  - llamaindex
