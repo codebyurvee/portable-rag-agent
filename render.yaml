@@ -16,7 +16,7 @@ services:
     type: web
     runtime: docker
     dockerfilePath: ./Dockerfile
-    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    dockerCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: QWEN_API_KEY
@@ -48,11 +48,7 @@ services:
     type: web
     runtime: docker
     dockerfilePath: ./Dockerfile
-    startCommand: >-
-      streamlit run ui/app.py
-      --server.address 0.0.0.0
-      --server.port $PORT
-      --server.headless true
+    dockerCommand: streamlit run ui/app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
     envVars:
       - key: API_BASE_URL
         sync: false          # set to https://<portable-rag-api>.onrender.com
