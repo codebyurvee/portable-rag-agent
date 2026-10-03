@@ -14,6 +14,31 @@ For every task:
 
 The human project lead decides when to move forward.
 
+## Completed Phases
+
+The following phases have been implemented and verified:
+
+- **Phase 0** — Repository, Python environment, base folder structure
+- **Phase 1** — Agent Contract (`AgentRequest`, `AgentResponse`, `Evidence`, `ToolCall`, `AgentStatus`, `AgentPassport`)
+- **Phase 2** — Test foundation (pytest structure, contract tests)
+- **Phase 3** — Document preparation (PDF/TXT/MD ingestion path)
+- **Phase 4** — RAG pipeline (parser → chunker → FastEmbed → Qdrant → retriever)
+- **Phase 5** — Tools (RAG Search, Calculator, Web Search)
+- **Phase 6** — Qwen3-8B model adapter (OpenAI-compatible, env-configured, live-verified)
+- **Phase 7** — Agent Core (framework-independent orchestration)
+- **Phase 8** — LangGraph implementation
+- **Phase 9** — LlamaIndex implementation
+- **Phase 10** — Portability verification (same behavioral contract across all three frameworks)
+- **Phase 11** — FastAPI (`/health`, `/query`, `/documents/upload`, `/documents`)
+- **Phase 12** — Streamlit UI (framework selector, query, evidence, document upload)
+- **Phase 13** — Docker + Python 3.11 (Dockerfile, docker-compose.yml, fastembed pre-baked)
+- **Phase 14** — SQLite persistence (query/run metadata)
+- **Phase 15** — User document upload (multipart API + Streamlit sidebar)
+
+Test baseline: **96 passed**.
+
+---
+
 ## Phase 0 — Existing Setup
 Completed:
 - GitHub repository

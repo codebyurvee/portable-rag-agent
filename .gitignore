@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local SQLite database (runtime artifact, not committed)
+*.db
+database/*.db
+
+# User-uploaded documents (runtime artifacts, not committed)
+documents/uploads/

@@ -1,0 +1,58 @@
+# Render deployment configuration — Portable RAG Research Agent
+# Two services: FastAPI API + Streamlit UI.
+#
+# BEFORE DEPLOYING:
+# 1. Create the API service first and note its public URL.
+# 2. Set API_BASE_URL on the UI service to that URL:
+#    API_BASE_URL=https://<your-api-service>.onrender.com
+# 3. Fill in all secret values (marked "your-...") in the Render dashboard.
+#    Never commit real secrets here.
+#
+# Qdrant: use Qdrant Cloud (https://cloud.qdrant.io) for persistent vector storage.
+# In-memory Qdrant (QDRANT_URL unset) works but loses all indexed vectors on restart.
+
+services:
+  - name: portable-rag-api
+    type: web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: QWEN_API_KEY
+        sync: false          # set in Render dashboard — never commit the real value
+      - key: QWEN_BASE_URL
+        value: https://router.huggingface.co/v1
+      - key: QWEN_MODEL
+        value: Qwen/Qwen3-8B
+      - key: QDRANT_URL
+        sync: false          # set to your Qdrant Cloud cluster URL
+      - key: QDRANT_API_KEY
+        sync: false          # set to your Qdrant Cloud API key
+      - key: QDRANT_COLLECTION
+        value: documents
+      - key: WEB_SEARCH_API_KEY
+        sync: false          # optional — leave unset to disable web search
+      - key: EMBEDDING_MODEL
+        value: BAAI/bge-small-en-v1.5
+      - key: FASTEMBED_CACHE_PATH
+        value: /app/.fastembed_cache
+      - key: DATABASE_PATH
+        value: /tmp/agent.db
+      - key: UPLOAD_DIR
+        value: /tmp/uploads
+      - key: MAX_UPLOAD_BYTES
+        value: "10485760"
+
+  - name: portable-rag-ui
+    type: web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    startCommand: >-
+      streamlit run ui/app.py
+      --server.address 0.0.0.0
+      --server.port $PORT
+      --server.headless true
+    envVars:
+      - key: API_BASE_URL
+        sync: false          # set to https://<portable-rag-api>.onrender.com

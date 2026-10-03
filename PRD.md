@@ -29,7 +29,7 @@ User Query → Agent → Decide Action → Tool → Retrieve/Process → Generat
 - Shared Agent Contract
 - Same verification tests for both implementations
 - Simple Streamlit UI
-- FastAPI backend if required/time permits
+- FastAPI backend
 - Minimal SQLite if required
 - Docker if time permits
 - Agent Passport documentation

@@ -1,27 +1,28 @@
 # ── Portable RAG Agent — Python dependencies ──
 
-# Core agent frameworks
+# Agent orchestration frameworks (portability targets)
 langgraph
-langchain
-llama-index
+llama-index-core
 
-# LLM / embedding providers
-openai
-anthropic
+# LLM provider (OpenAI-compatible client used against the Qwen endpoint)
+openai==3.22.1
 
-# Vector stores
-chromadb
+# Vector store
+qdrant-client
 
 # API layer
 fastapi
 uvicorn[standard]
 pydantic
 pydantic-settings
+python-multipart
 
 # Document loading / parsing
 pypdf
-python-docx
-unstructured
+
+# Embeddings (local ONNX, no API key)
+fastembed
+numpy
 
 # UI
 streamlit
