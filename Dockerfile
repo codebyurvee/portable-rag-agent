@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY api ./api
 COPY app ./app
 COPY ui ./ui
+COPY database ./database
 COPY documents ./documents
 
 # Pre-bake the fastembed embedding model into the image so cold starts
