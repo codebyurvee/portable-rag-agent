@@ -10,6 +10,23 @@ import streamlit as st
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
+
+def _safe_json(resp: httpx.Response):
+    """Return parsed JSON or None — never raises JSONDecodeError."""
+    try:
+        return resp.json()
+    except Exception:
+        return None
+
+
+def _error_detail(resp: httpx.Response) -> str:
+    """Extract a readable error message from any response, JSON or plain text."""
+    data = _safe_json(resp)
+    if data is not None and isinstance(data, dict):
+        return data.get("detail", resp.text)
+    return resp.text or f"HTTP {resp.status_code}"
+
+
 st.set_page_config(page_title="Portable RAG Research Agent", page_icon="🔎")
 
 st.title("Portable RAG Research Agent")
@@ -36,15 +53,18 @@ with st.sidebar:
             st.error(f"Could not reach the API at {API_BASE_URL}: {type(e).__name__}")
         else:
             if up.status_code != 200:
-                detail = up.json().get("detail", up.text) if up.content else up.text
-                st.error(f"Upload failed ({up.status_code}): {detail}")
+                st.error(f"Upload failed ({up.status_code}): {_error_detail(up)}")
             else:
-                d = up.json()
-                st.success(f"Indexed {d['filename']}: {d['chunks_indexed']} chunk(s)")
+                d = _safe_json(up)
+                if d:
+                    st.success(f"Indexed {d['filename']}: {d['chunks_indexed']} chunk(s)")
+                else:
+                    st.warning(f"Upload returned unexpected response: {up.text[:200]}")
 
     try:
         listing = httpx.get(f"{API_BASE_URL}/documents", timeout=15)
-        docs = listing.json().get("documents", []) if listing.status_code == 200 else []
+        listing_data = _safe_json(listing)
+        docs = listing_data.get("documents", []) if listing_data and listing.status_code == 200 else []
     except Exception:
         docs = []
     if docs:
@@ -75,33 +95,35 @@ if st.button("Ask", type="primary"):
             st.error(f"Could not reach the API at {API_BASE_URL}: {type(e).__name__}")
         else:
             if resp.status_code != 200:
-                detail = resp.json().get("detail", resp.text) if resp.content else resp.text
-                st.error(f"API error {resp.status_code}: {detail}")
+                st.error(f"API error {resp.status_code}: {_error_detail(resp)}")
             else:
-                data = resp.json()
-                status = data.get("status")
-                (st.success if status == "success" else st.info)(f"Status: {status}")
+                data = _safe_json(resp)
+                if data is None:
+                    st.error(f"API returned a non-JSON response: {resp.text[:200]}")
+                else:
+                    status = data.get("status")
+                    (st.success if status == "success" else st.info)(f"Status: {status}")
 
-                st.subheader("Answer")
-                st.write(data.get("answer") or "_(no answer)_")
+                    st.subheader("Answer")
+                    st.write(data.get("answer") or "_(no answer)_")
 
-                tools = data.get("tools_used") or []
-                st.subheader("Tools used")
-                st.write(", ".join(tools) if tools else "_(none)_")
-                if data.get("tool_calls"):
-                    with st.expander("Tool calls"):
-                        st.json(data["tool_calls"])
+                    tools = data.get("tools_used") or []
+                    st.subheader("Tools used")
+                    st.write(", ".join(tools) if tools else "_(none)_")
+                    if data.get("tool_calls"):
+                        with st.expander("Tool calls"):
+                            st.json(data["tool_calls"])
 
-                evidence = data.get("evidence") or []
-                st.subheader("Evidence")
-                if not evidence:
-                    st.write("_(no evidence)_")
-                for e in evidence:
-                    label = f"{e.get('source')}"
-                    if e.get("page") is not None:
-                        label += f" · page {e['page']}"
-                    label += f" · {e.get('chunk_id')}"
-                    with st.expander(label):
-                        st.write(e.get("text"))
+                    evidence = data.get("evidence") or []
+                    st.subheader("Evidence")
+                    if not evidence:
+                        st.write("_(no evidence)_")
+                    for e in evidence:
+                        label = f"{e.get('source')}"
+                        if e.get("page") is not None:
+                            label += f" · page {e['page']}"
+                        label += f" · {e.get('chunk_id')}"
+                        with st.expander(label):
+                            st.write(e.get("text"))
 
-                st.caption(f"Served by: {data.get('framework')}")
+                    st.caption(f"Served by: {data.get('framework')}")
