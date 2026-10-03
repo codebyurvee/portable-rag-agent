@@ -14,6 +14,7 @@
 services:
   - name: portable-rag-api
     type: web
+    plan: free
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
@@ -46,6 +47,7 @@ services:
 
   - name: portable-rag-ui
     type: web
+    plan: free
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerCommand: streamlit run ui/app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
